@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" ng-app="todomvc" data-framework="firebase">
+	<head>
+		<meta charset="utf-8">
+		<title>DO IT</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+		<style rel='stylesheet' href='style.css'>
+		<style>[ng-cloak] { display: none; }</style>
+	</head>
+	<body>
+		<div class='container' ng-app="todomvc" ng-controller="TodoCtrl">
+			
+			<section class='row'>
+				<header>
+					<h1 class='text-center'>DO IT
+					<button class="btn-lg btn-primary btn" ng-click="login()" ng-show="showlogin">login</button></h1>
+					<h4 ng-show="!showlogin"><strong>{{remainingCount}}</strong> things to do</h4>
+					<form ng-submit="addTodo()" ng-show="!showlogin">
+						<input class='form-control' placeholder="What do you gotta do?" ng-model="newTodo" autofocus>
+					</form>
+				</header>
+				<section ng-show="totalCount" ng-cloak></section>
+			</section>
+<div ng-show="!showlogin">		
+<div class="list-group col-md-4">
+	<h2 class="text-center">New</h2>
+	<div ng-repeat="todo in todos | filter:{status:'new'} | orderBy:priority" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+		<div class="view" ng-if='todo !== editedTodo' ng-right-click="topPriority(todo,'new')">
+<div class="btn-group btn-group-xs">
+<button ng-click="statusTodo(todo, 'pending')" class="btn btn-success"><span class="glyphicon glyphicon-chevron-right"></span></button>
+ <button ng-click="statusTodo(todo,'parked')" class="btn btn-warning"><span class="glyphicon glyphicon-time"></span></button>
+</div>
+<span ng-dblclick="editTodo(todo)">  {{todo.title}}</span>	
+		</div>
+	
+	<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+		<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+	</form>
+	</div>
+</div>
+					
+<div class="list-group col-md-4">
+<h2 class="text-center">Pending</h2>
+<div ng-repeat="todo in todos | filter:{status:'pending'} | orderBy:priority" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+							<div class="view" ng-if='todo !== editedTodo' ng-right-click="topPriority(todo,'pending')">
+<div class="btn-group btn-group-xs">
+<button ng-click="completeTodo(todo)" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+ <button ng-click="statusTodo(todo,'parked')" class="btn btn-warning"><span class="glyphicon glyphicon-time"></span></button>
+</div><span ng-dblclick="editTodo(todo)">  {{todo.title}}</span>  
+								
+							</div>
+							<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+								<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+							</form>
+						</div>
+</div>						
+					
+<div class="list-group col-md-4">
+<h2 class="text-center">Completed</h2>
+<div ng-repeat="todo in todos | filter:{status:'completed'}|orderBy:'donedate'" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+							<div class="view" ng-if='todo !== editedTodo'>
+								<button ng-click="statusTodo(todo, 'new')" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-repeat"></span></button>  <span ng-dblclick="editTodo(todo)">{{todo.donedate | date: 'shortDate'}} - {{todo.title}}</span>  
+								
+							</div>
+							<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+								<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+							</form>
+						</div>
+						
+					<div class='btn btn-default pull-right' ng-if="(todos|filter:{status:'completed'}).length >0" ng-click='clearCompletedTodos()'>Clear completed</div>
+</div>
+<div class="clearfix "></div>			
+<div class ="list-group col-md-6 text-center"><h3>Parking Lot</h3>
+
+<div ng-repeat="todo in todos | filter:{status:'parked'}" class="list-group-item">
+<button ng-click="statusTodo(todo, 'new')" class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-repeat"></span></button> {{todo.title}}
+
+</div>
+</div>
+<div class ="list-group col-md-6 text-center"><h3>Archived  <button class="btn btn-xs" ng-click="showme=true" ng-hide="showme">Show</button>
+<button class="btn btn-xs" ng-click="showme=false" ng-show="showme">Hide</button></h3>
+		<div ng-repeat="todo in todos | filter:{status:'archived'} | orderBy:'-donedate'" class="list-group-item" ng-show="showme">
+		{{todo.donedate | date: 'shortDate'}} - {{todo.title}}
+		</div>
+</div>					
+</div>	
+</div>		
+
+		<!-- AngularJS -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js"></script>
+		<!-- Firebase -->
+		<script src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+		<!-- AngularFire -->
+		<script src="https://cdn.firebase.com/libs/angularfire/0.9.0/angularfire.min.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

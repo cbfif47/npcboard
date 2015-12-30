@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" ng-app="todomvc" data-framework="firebase">
+	<head>
+		<meta charset="utf-8">
+		<title>DO IT</title>
+		<link rel="stylesheet" href="bootstrap.min.css">
+		<style rel='stylesheet' href='style.css'>
+		<style>[ng-cloak] { display: none; }</style>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	</head>
+	<body>
+		<div class='container' ng-app="todomvc" ng-controller="TodoCtrl">
+<button class="btn-xs btn-primary btn pull-right" ng-click="logout()" ng-show="!showlogin">Logout</button><br>			
+			<section class="row col-md-12">
+				<header>
+					<h1 class='text-center'>DO IT</h1>
+					<div class="text-center"><button class="btn-lg btn-primary btn text-center" ng-click="login()" ng-show="showlogin">Login</button></div>
+					<h4 ng-show="!showlogin"><strong>{{remainingCount}}</strong> things to do</h4>
+					<form ng-submit="addTodo()" ng-show="!showlogin">
+						<input class='form-control' placeholder="What do you gotta do?" ng-model="newTodo" autofocus>
+					</form>
+				</header>
+				<section ng-show="totalCount" ng-cloak></section>
+			</section>
+<div ng-show="!showlogin">		
+<div class="list-group col-md-4">
+	<h2 class="text-center">New</h2>
+	<div ng-repeat="todo in todos | filter:{status:'new'} | orderBy:priority" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+		<div class="view" ng-if='todo !== editedTodo'>
+<div class="btn-group btn-group-sm" uib-dropdown>
+<button id="split-button" type="button" ng-click="statusTodo(todo, 'pending')" class="btn btn-success"><span class="glyphicon glyphicon-chevron-right"></span></button>
+      <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+        <span class="caret"></span>
+        <span class="sr-only">Split button!</span>
+      </button>
+	<ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+        <li role="menuitem">
+	<button ng-click="completeTodo(todo)" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok"></span></button>
+	<button ng-click="statusTodo(todo,'parked')" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-time"></span></button>
+        <button ng-click="topPriority(todo,'new')" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-upload"></span></button>
+	<button ng-click="bottomPriority(todo,'new')" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download"></span></button>
+	<button ng-click="deleteTodo(todo)" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span></button>
+	</li>
+      </ul>
+</div>
+<span ng-dblclick="editTodo(todo)" style="margin-left:5px">{{todo.title}}</span>
+
+
+
+		</div>
+	
+	<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+		<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+	</form>
+	</div>
+</div>
+					
+<div class="list-group col-md-4">
+<h2 class="text-center">Pending</h2>
+<div ng-repeat="todo in todos | filter:{status:'pending'} | orderBy:priority" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+							<div class="view" ng-if='todo !== editedTodo'>
+<div class="btn-group btn-group-sm" uib-dropdown>
+<button id="split-button" type="button" ng-click="completeTodo(todo)" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+      <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+        <span class="caret"></span>
+        <span class="sr-only">Split button!</span>
+      </button>
+	<ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+        <li role="menuitem">
+	<button ng-click="statusTodo(todo,'new')" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-chevron-left"></span></button>
+	<button ng-click="statusTodo(todo,'parked')" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-time"></span></button>
+        <button ng-click="topPriority(todo,'new')" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-upload"></span></button>
+	<button ng-click="bottomPriority(todo,'new')" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-download"></span></button>
+	<button ng-click="deleteTodo(todo)" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span></button>
+	</li>
+      </ul>
+</div>
+<span ng-dblclick="editTodo(todo)" style="margin-left:5px">{{todo.title}}</span>  
+								
+							</div>
+							<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+								<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+							</form>
+						</div>
+</div>						
+					
+<div class="list-group col-md-4">
+<h2 class="text-center">Completed</h2>
+<div ng-repeat="todo in todos | filter:{status:'completed'}|orderBy:'donedate'" class="list-group-item" ng-class="{editing: todo == editedTodo}">
+							<div class="view" ng-if='todo !== editedTodo'>
+								<button ng-click="statusTodo(todo, 'new')" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-repeat"></span></button><span ng-dblclick="editTodo(todo)" style="margin-left:6px">{{todo.donedate | date: 'shortDate'}} - {{todo.title}}</span>  
+
+								
+							</div>
+							<form ng-submit="doneEditing(todo)" ng-if='todo == editedTodo'>
+								<input class="edit" ng-model="todo.title" todo-blur="doneEditing(todo)" todo-focus="todo == editedTodo">
+							</form>
+						</div>
+						
+					<div class='btn btn-default pull-right' ng-if="(todos|filter:{status:'completed'}).length >0" ng-click='clearCompletedTodos()'>Clear completed</div>
+</div>
+<div class="clearfix "></div>			
+<div class ="list-group col-md-6"><h3 class="text-center">Parking Lot</h3>
+
+<div ng-repeat="todo in todos | filter:{status:'parked'}" class="list-group-item">
+<button ng-click="statusTodo(todo, 'new')" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-repeat"></span></button><span style="margin-left:8px">{{todo.title}}</span>
+
+</div>
+</div>
+<div class ="list-group col-md-6"><h3 class="text-center">Archived  <button class="btn btn-xs btn-default" ng-click="showme=true" ng-hide="showme">Show</button>
+<button class="btn btn-xs btn-default" ng-click="showme=false" ng-show="showme">Hide</button></h3>
+		<div ng-repeat="todo in todos | filter:{status:'archived'} | orderBy:'-donedate'" class="list-group-item" ng-show="showme">
+		{{todo.donedate | date: 'shortDate'}} - {{todo.title}}
+		</div>
+</div>					
+</div>	
+</div>		
+
+		<!-- AngularJS -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js"></script>
+		<!-- Firebase -->
+		<script src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+		<!-- AngularFire -->
+		<script src="https://cdn.firebase.com/libs/angularfire/0.9.0/angularfire.min.js"></script>
+		<script src="ui-bootstrap-tpls-0.14.3.min.js"></script>
+		<script src="app.js"></script>
+		
+	</body>
+</html>
